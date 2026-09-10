@@ -14,6 +14,11 @@ public class RecordEnvelope implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final byte[] payload;
+
+    /**
+     * Absolute timestamp in milliseconds at which this record expires,
+     * or {@code null} if the record does not expire.
+     */
     private final Long expireAt;
 
     /**

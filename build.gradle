@@ -46,7 +46,7 @@ java {
 }
 
 mavenPublishing {
-    coordinates(group.toString(), 'LamKore', version.toString())
+    coordinates(group.toString(), 'TinyStore', version.toString())
 
     configure(new JavaLibrary(
             new JavadocJar.Javadoc(),
