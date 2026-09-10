@@ -1,101 +1,84 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
     id 'java'
     id 'maven-publish'
     id 'signing'
-    id 'org.jreleaser' version '1.18.0'
+    id 'com.vanniktech.maven.publish' version '0.37.0'
 }
 
 group = 'com.kyfstore'
-version = '1.0.0'
+version = '1.0.1'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.13.1'
+    // SQL Drivers
+    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    implementation 'org.postgresql:postgresql:42.7.5'
 
-    testImplementation platform('org.junit:junit-bom:5.10.0')
+    // Formats (JSON, XML, YAML, TOML)
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.18.2'
+
+    // HOCON / CONF
+    implementation 'com.typesafe:config:1.4.3'
+
+    // LZMA Compression
+    implementation 'org.tukaani:xz:1.10'
+
+    testImplementation platform("org.junit:junit-bom:${project.junit_version}")
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
 
 java {
-    withJavadocJar()
     withSourcesJar()
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.kyfstore'
-            artifactId = 'tinystore'
+mavenPublishing {
+    coordinates(group.toString(), 'LamKore', version.toString())
 
-            from components.java
+    configure(new JavaLibrary(
+            new JavadocJar.Javadoc(),
+            true
+    ))
 
-            pom {
-                name = 'TinyStore'
-                description = 'TinyStore is a lightweight Java key-value storage API designed for simple, type-safe local persistence with JSON and binary support. It features versioned APIs and extensible metadata, making it easy to manage small config or runtime data efficiently.'
-                url = 'https://github.com/KyfStore11k/TinyStore'
-                inceptionYear = '2025'
-                licenses {
-                    license {
-                        name = 'MIT'
-                        url = 'https://opensource.org/license/mit'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'KyfStore11k'
-                        name = 'Kyle Fwi'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/KyfStore11k/TinyStore.git'
-                    developerConnection = 'scm:git:ssh://github.com/KyfStore11k/TinyStore.git'
-                    url = 'http://github.com/KyfStore11k/TinyStore'
-                }
+    pom {
+        name = 'TinyStore'
+        description = 'TinyStore is a format-agnostic, zero-friction storage layer for Java. Store structured objects into SQLite, PostgreSQL, or flat files using JSON, YAML, TOML, or binary payloads - with built-in compression pipelines and automatic TTL expiration out of the box.'
+        inceptionYear = '2026'
+        url = 'https://github.com/lammy12k/TinySTore'
+
+        licenses {
+            license {
+                name = 'MIT License'
+                url = 'https://opensource.org'
             }
         }
-    }
-
-    repositories {
-        maven {
-            url = layout.buildDirectory.dir('staging-deploy')
-        }
-    }
-}
-
-signing {
-    useGpgCmd()
-    sign publishing.publications.maven
-}
-
-jreleaser {
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-    gitRootSearch = true
-    deploy {
-        maven {
-            mavenCentral {
-                sonatype {
-                    active = 'ALWAYS'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    stagingRepository('build/staging-deploy')
-
-                    snapshotSupported = true
-
-                    username = '__USE_ENVIRONMENT_VARIABLE__'
-                    password = '__USE_ENVIRONMENT_VARIABLE__'
-                    authorization = "BEARER"
-                }
+        developers {
+            developer {
+                id = 'lammy12k'
+                name = 'lammy12k'
+                email = ''
             }
         }
+        scm {
+            connection = 'scm:git:git://://github.com'
+            developerConnection = 'scm:git:ssh://://github.com'
+            url = 'https://github.com/lammy12k/TinyStore'
+        }
     }
+
+    publishToMavenCentral()
+    signAllPublications()
 }
