@@ -13,6 +13,9 @@ public class RecordEnvelope implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Raw serialized data payload.
+     */
     private final byte[] payload;
 
     /**
